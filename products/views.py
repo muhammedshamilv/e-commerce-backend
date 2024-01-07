@@ -1,3 +1,6 @@
+from rest_framework.pagination import PageNumberPagination
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter
 from django.utils import timezone
 from django.shortcuts import render
 from rest_framework.views import APIView
@@ -53,6 +56,13 @@ class GetAllProducts(generics.ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filterset_fields = {
+        'category__name': ['exact'],
+        'price': ['gte', 'lte'],
+    }
+    search_fields = ['name', 'details', 'category__name']
+    pagination_class = PageNumberPagination
 
 
 class GetCategories(generics.ListAPIView):
