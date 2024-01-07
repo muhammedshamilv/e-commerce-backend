@@ -9,6 +9,46 @@ from rest_framework import status, generics
 # Create your views here.
 
 
+class ProductPost(generics.CreateAPIView):
+    serializer_class = ProductSerializer
+    permission_classes = [IsAdminUser]
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            product = serializer.save()
+            serialized_product = ProductSerializer(product).data
+            return Response({"message": "Product created successfully", "product": serialized_product}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class GetProductDetails(generics.RetrieveAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    lookup_field = 'id'
+    permission_classes = [IsAuthenticated]
+
+
+# edit product
+class UpdateProduct(APIView):
+    serializer_class = ProductSerializer
+    permission_classes = [IsAdminUser]
+
+    def put(self, request, *args, **kwargs):
+        try:
+            instance = Product.objects.get(id=kwargs.get('id'))
+        except Product.DoesNotExist:
+            return Response({"message": "product not found."}, status=status.HTTP_404_NOT_FOUND)
+        serializer = ProductSerializer(
+            instance, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            serializer = ProductSerializer(
+                instance).data
+            return Response({"message": "product updated successfully.", "data": serializer}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class GetAllProducts(generics.ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
@@ -20,6 +60,10 @@ class GetCategories(generics.ListAPIView):
     serializer_class = CategorySerializer
     permission_classes = [IsAuthenticated]
 
+# add to cart
+
+# remove from cart
+
 
 class GetCartItems(generics.ListAPIView,):
     serializer_class = CartSerializer
@@ -27,12 +71,23 @@ class GetCartItems(generics.ListAPIView,):
 
     def get(self, request, *args, **kwargs):
         try:
-            instance = Cart.objects.get(user=kwargs.get('user_id'))
+            instance = Cart.objects.filter(user=kwargs.get('user_id'))
         except Cart.DoesNotExist:
             return Response({"message": "cart items not found."}, status=status.HTTP_404_NOT_FOUND)
         serializer = CartSerializer(
-            instance).data
+            instance, many=True).data
         return Response({"data": serializer}, status=status.HTTP_200_OK)
+
+
+#
+
+class PostOrders(generics.CreateAPIView):
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
+
+# get order by id
+
+# delete order check time
 
 
 class GetOrderedItems(generics.ListAPIView,):
@@ -41,16 +96,9 @@ class GetOrderedItems(generics.ListAPIView,):
 
     def get(self, request, *args, **kwargs):
         try:
-            instance = Order.objects.get(user=kwargs.get('user_id'))
+            instance = Order.objects.filter(user=kwargs.get('user_id'))
         except Cart.DoesNotExist:
             return Response({"message": "order items not found."}, status=status.HTTP_404_NOT_FOUND)
         serializer = OrderSerializer(
-            instance).data
+            instance, many=True).data
         return Response({"data": serializer}, status=status.HTTP_200_OK)
-
-
-class GetProductDetails(generics.RetrieveAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    lookup_field = 'id'
-    permission_classes = [IsAuthenticated]
