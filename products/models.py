@@ -27,4 +27,5 @@ class Order(AbstractBaseModel):
     user = models.ForeignKey('user.User', on_delete=models.CASCADE)
     products = models.ManyToManyField(Product)
     quantity = models.IntegerField(default=1)
+    unit_price = models.DecimalField(max_digits=6, decimal_places=2)
     address = models.TextField()

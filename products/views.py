@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from products.models import *
-from products.serializers.product_serializers import CartSerializer, ProductSerializer, CategorySerializer
+from products.serializers.product_serializers import CartSerializer, OrderSerializer, ProductSerializer, CategorySerializer
 
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
@@ -33,3 +33,24 @@ class GetCartItems(generics.ListAPIView,):
         serializer = CartSerializer(
             instance).data
         return Response({"data": serializer}, status=status.HTTP_200_OK)
+
+
+class GetOrderedItems(generics.ListAPIView,):
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        try:
+            instance = Order.objects.get(user=kwargs.get('user_id'))
+        except Cart.DoesNotExist:
+            return Response({"message": "order items not found."}, status=status.HTTP_404_NOT_FOUND)
+        serializer = OrderSerializer(
+            instance).data
+        return Response({"data": serializer}, status=status.HTTP_200_OK)
+
+
+class GetProductDetails(generics.RetrieveAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    lookup_field = 'id'
+    permission_classes = [IsAuthenticated]
