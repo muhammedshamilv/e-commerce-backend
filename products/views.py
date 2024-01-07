@@ -1,8 +1,9 @@
+from django.utils import timezone
 from django.shortcuts import render
 from rest_framework.views import APIView
 from products.models import *
 from products.serializers.product_serializers import CartSerializer, OrderSerializer, ProductSerializer, CategorySerializer
-
+from datetime import datetime, timedelta
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework import status, generics
@@ -29,7 +30,6 @@ class GetProductDetails(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated]
 
 
-# edit product
 class UpdateProduct(APIView):
     serializer_class = ProductSerializer
     permission_classes = [IsAdminUser]
@@ -60,9 +60,21 @@ class GetCategories(generics.ListAPIView):
     serializer_class = CategorySerializer
     permission_classes = [IsAuthenticated]
 
-# add to cart
 
-# remove from cart
+class AddToCart(generics.CreateAPIView):
+    serializer_class = CartSerializer
+    permission_classes = [IsAuthenticated]
+
+
+class DeleteFromCart(generics.DestroyAPIView):
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            instance = Cart.objects.get(id=kwargs.get('id'))
+        except Cart.DoesNotExist:
+            return Response({"message": "Cart not found."}, status=status.HTTP_404_NOT_FOUND)
+        instance.delete()
+        return Response({"message": "Cart deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
 
 
 class GetCartItems(generics.ListAPIView,):
@@ -79,15 +91,30 @@ class GetCartItems(generics.ListAPIView,):
         return Response({"data": serializer}, status=status.HTTP_200_OK)
 
 
-#
-
 class PostOrders(generics.CreateAPIView):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
 
-# get order by id
 
-# delete order check time
+class GetOrderDetails(generics.RetrieveAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    lookup_field = 'id'
+    permission_classes = [IsAuthenticated]
+
+
+class DeleteOrder(generics.DestroyAPIView):
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            instance = Order.objects.get(id=kwargs.get('id'))
+        except Cart.DoesNotExist:
+            return Response({"message": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
+        current_datetime = timezone.now()
+        if current_datetime - instance.created_at > timedelta(hours=12):
+            return Response({"message": "Orders older than 12 hours cannot be deleted."}, status=status.HTTP_400_BAD_REQUEST)
+        instance.delete()
+        return Response({"message": "Order deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
 
 
 class GetOrderedItems(generics.ListAPIView,):
