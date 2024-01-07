@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 import os
 from dotenv import load_dotenv
@@ -60,10 +61,16 @@ REST_FRAMEWORK = {
     )
 }
 
+
 SITE_ID = 1
 REST_AUTH = {
     'USE_JWT': True,
     'USER_DETAILS_SERIALIZER': 'user.serializers.user_serializer.CustomLoginSerializer',
+}
+
+# Set the access token lifetime to 1 day
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
 }
 AUTH_USER_MODEL = 'user.User'
 
