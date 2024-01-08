@@ -15,7 +15,8 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class CartSerializer(serializers.ModelSerializer):
-    products = ProductSerializer(many=True)
+    # user=serializers.UUIDField()
+    # product=serializers.UUIDField()
 
     class Meta:
         model = Cart
@@ -23,8 +24,6 @@ class CartSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    products = ProductSerializer(many=True, read_only=True)
-
     class Meta:
         model = Order
         fields = "__all__"

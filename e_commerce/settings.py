@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'user',
     'products',
 
+    'drf_yasg',
+
     'allauth',
     'allauth.account',
     'allauth.socialaccount',

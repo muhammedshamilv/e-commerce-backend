@@ -19,13 +19,16 @@ class Product(AbstractBaseModel):
 
 
 class Cart(AbstractBaseModel):
-    user = models.ForeignKey('user.User', on_delete=models.CASCADE)
-    products = models.ManyToManyField(Product)
+    user = models.ForeignKey(
+        'user.User', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
 
+    class Meta:
+        unique_together=["user","product"]
 
 class Order(AbstractBaseModel):
     user = models.ForeignKey('user.User', on_delete=models.CASCADE)
-    products = models.ManyToManyField(Product)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
     unit_price = models.DecimalField(max_digits=6, decimal_places=2)
     address = models.TextField()

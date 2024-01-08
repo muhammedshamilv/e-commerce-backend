@@ -64,6 +64,10 @@ class GetAllProducts(generics.ListAPIView):
     search_fields = ['name', 'details', 'category__name']
     pagination_class = PageNumberPagination
 
+# http://127.0.0.1:8000/product/?page=1&page_size=5
+# /products/?category__name=electronics
+# /products/?search=query
+
 
 class GetCategories(generics.ListAPIView):
     queryset = Category.objects.all()
@@ -77,7 +81,6 @@ class AddToCart(generics.CreateAPIView):
 
 
 class DeleteFromCart(generics.DestroyAPIView):
-
     def delete(self, request, *args, **kwargs):
         try:
             instance = Cart.objects.get(id=kwargs.get('id'))
