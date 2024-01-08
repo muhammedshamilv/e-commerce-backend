@@ -27,8 +27,10 @@ SECRET_KEY = "django-insecure-ozfzni*_i)wdkv6x6yi&i$24y3*qugcavzb@t_0ody898c@-!+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ["127.0.0.1"]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # Add your frontend URL
+]
 
 # Application definition
 INSTALLED_APPS = [
@@ -59,7 +61,7 @@ INSTALLED_APPS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 3,
+    'PAGE_SIZE': 100,
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
     )
@@ -90,6 +92,9 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
+MEDIA_ROOT = BASE_DIR / "uploads"
+
+MEDIA_URL = '/uploads/'
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
