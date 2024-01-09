@@ -81,7 +81,7 @@ python manage.py runserver
 
 To view API documentation go to
 
-admin should be loged in to admin site to access API documentation and redoc
+admin should be logged in to admin site to access API documentation and redoc
 
 ```
 http://127.0.0.1:8000/swagger/
