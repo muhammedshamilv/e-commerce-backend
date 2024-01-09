@@ -25,33 +25,6 @@ class ProductPost(generics.CreateAPIView):
             return Response({"message": "Product created successfully", "product": serialized_product}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-class GetProductDetails(generics.RetrieveAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    lookup_field = 'id'
-    permission_classes = [IsAuthenticated]
-
-
-class UpdateProduct(APIView):
-    serializer_class = ProductSerializer
-    permission_classes = [IsAdminUser]
-
-    def put(self, request, *args, **kwargs):
-        try:
-            instance = Product.objects.get(id=kwargs.get('id'))
-        except Product.DoesNotExist:
-            return Response({"message": "product not found."}, status=status.HTTP_404_NOT_FOUND)
-        serializer = ProductSerializer(
-            instance, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            serializer = ProductSerializer(
-                instance).data
-            return Response({"message": "product updated successfully.", "data": serializer}, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 class GetAllProducts(generics.ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
@@ -64,9 +37,18 @@ class GetAllProducts(generics.ListAPIView):
     search_fields = ['name', 'details', 'category__name']
     pagination_class = PageNumberPagination
 
-# http://127.0.0.1:8000/product/?page=1&page_size=5
-# /products/?category__name=electronics
-# /products/?search=query
+class ProductDetailsAPI(generics.RetrieveUpdateAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    lookup_field = 'id'
+    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        if self.request.method == 'PUT':
+            return [IsAdminUser()]
+        return super().get_permissions()
+
+
 
 
 class GetCategories(generics.ListAPIView):
