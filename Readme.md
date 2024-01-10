@@ -106,3 +106,9 @@ email is used to login to admin account
 ```
 python manage.py createsuperuser
 ```
+
+To run test
+
+```
+pytest
+```
